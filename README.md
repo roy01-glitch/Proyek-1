@@ -1,2 +1,2 @@
-# Proyek-1
+manajemen-mahasiswa.html
 Kelompok Strukdat
