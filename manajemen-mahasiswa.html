@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manajemen Daftar Mahasiswa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#24272C;
+    --paper:#EDE6D6;
+    --card:#FBF8F0;
+    --line:#C6BC9F;
+    --seal:#8B2E2E;
+    --seal-dark:#6E2323;
+    --forest:#3F5D42;
+    --forest-dark:#324A35;
+    --muted:#6B6455;
+    --radius:3px;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2{
+    font-family:'Source Serif 4', serif;
+    font-weight:700;
+    margin:0;
+  }
+
+  .nim, .mono{
+    font-family:'IBM Plex Mono', monospace;
+    font-variant-numeric:tabular-nums;
+  }
+
+  a{color:inherit;}
+
+  /* ---------- Header letterhead ---------- */
+  header.letterhead{
+    background:var(--ink);
+    color:var(--paper);
+    padding:34px 24px 28px;
+  }
+  .letterhead-inner{
+    max-width:1040px;
+    margin:0 auto;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    border-bottom:1px solid rgba(237,230,214,0.28);
+    padding-bottom:22px;
+  }
+  .letterhead h1{
+    font-size:clamp(28px, 4vw, 38px);
+    color:#F5F1E6;
+    letter-spacing:-0.01em;
+  }
+  .letterhead p{
+    margin:8px 0 0;
+    color:#C9C2AC;
+    font-size:15px;
+    max-width:46ch;
+  }
+  .letterhead .stamp{
+    border:1.5px solid #A8916C;
+    color:#D8CDAE;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:8px 14px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  /* ---------- Layout ---------- */
+  main{
+    max-width:1040px;
+    margin:0 auto;
+    padding:32px 24px 64px;
+    display:grid;
+    grid-template-columns:340px 1fr;
+    gap:24px;
+    align-items:start;
+  }
+  @media (max-width:760px){
+    main{grid-template-columns:1fr;}
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+  }
+
+  /* ---------- Form card ---------- */
+  .form-card{
+    border-top:3px solid var(--seal);
+    padding:22px 22px 24px;
+    position:sticky;
+    top:24px;
+  }
+  .form-card h2{font-size:19px;}
+  .form-card .lede{
+    color:var(--muted);
+    font-size:13.5px;
+    margin:6px 0 20px;
+  }
+
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:6px;
+    color:var(--ink);
+  }
+  .field input{
+    width:100%;
+    padding:10px 11px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#fff;
+    font-family:inherit;
+    font-size:14.5px;
+    color:var(--ink);
+  }
+  .field input.nim-input{font-family:'IBM Plex Mono', monospace;}
+  .field input:focus-visible, button:focus-visible, .icon-btn:focus-visible{
+    outline:2px solid var(--seal);
+    outline-offset:2px;
+  }
+
+  button.primary{
+    width:100%;
+    background:var(--seal);
+    color:#F7F1E4;
+    border:none;
+    padding:11px 16px;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  button.primary:hover{background:var(--seal-dark);}
+  button.primary:active{transform:translateY(1px);}
+
+  .status{
+    margin-top:16px;
+    padding:10px 12px;
+    border-radius:var(--radius);
+    font-size:13.5px;
+    display:none;
+    border-left:3px solid transparent;
+  }
+  .status.show{display:block;}
+  .status.ok{background:#E7EDE7; border-color:var(--forest); color:var(--forest-dark);}
+  .status.err{background:#F3E4E2; border-color:var(--seal); color:var(--seal-dark);}
+
+  .note{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+    font-size:12.5px;
+    color:var(--muted);
+  }
+
+  /* ---------- Roster card ---------- */
+  .roster-card{padding:22px 22px 10px;}
+  .roster-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px 16px;
+    margin-bottom:16px;
+  }
+  .roster-head h2{font-size:19px;}
+  .roster-head .count{
+    font-weight:400;
+    color:var(--muted);
+    font-size:15px;
+  }
+
+  .search-wrap{margin-bottom:14px;}
+  .search-wrap input{
+    width:100%;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#fff;
+    font-family:inherit;
+    font-size:14.5px;
+  }
+
+  .table-wrap{
+    overflow-x:auto;
+    border-top:1px solid var(--line);
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  }
+  thead th{
+    text-align:left;
+    font-size:12px;
+    font-weight:600;
+    color:var(--muted);
+    padding:10px 8px;
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:11px 8px;
+    border-bottom:1px solid #DDD5BE;
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.col-no{color:var(--muted); width:34px;}
+  td.col-nim{white-space:nowrap;}
+  td.col-aksi{text-align:right; white-space:nowrap;}
+
+  tr.row-new{animation:stampIn 900ms ease-out;}
+  @keyframes stampIn{
+    0%{background:#E4CFA9;}
+    100%{background:transparent;}
+  }
+  tr.row-leaving{animation:fadeOut 260ms ease forwards;}
+  @keyframes fadeOut{
+    to{opacity:0; transform:translateX(6px);}
+  }
+
+  .icon-btn{
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--muted);
+    font-family:inherit;
+    font-size:12.5px;
+    font-weight:500;
+    padding:6px 10px;
+    border-radius:var(--radius);
+    cursor:pointer;
+  }
+  .icon-btn:hover{border-color:var(--seal); color:var(--seal);}
+  .icon-btn.confirm{background:var(--seal); color:#F7F1E4; border-color:var(--seal);}
+  .icon-btn.cancel{margin-left:6px;}
+
+  .empty-row td{
+    padding:26px 8px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13.5px;
+  }
+
+  footer{
+    max-width:1040px;
+    margin:0 auto;
+    padding:0 24px 40px;
+    color:var(--muted);
+    font-size:12.5px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    tr.row-new, tr.row-leaving{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="letterhead">
+  <div class="letterhead-inner">
+    <div>
+      <h1>Manajemen Daftar Mahasiswa</h1>
+      <p>Modul Struktur Data (Array &amp; List) — Proyek 1: menambah, menghapus, mencari, dan menampilkan data mahasiswa.</p>
+    </div>
+    <span class="stamp">PROYEK 1 · ARRAY &amp; LIST</span>
+  </div>
+</header>
+
+<main>
+  <!-- Form: Tambah Mahasiswa -->
+  <section class="card form-card">
+    <h2>Tambah mahasiswa</h2>
+    <p class="lede">Isi nama dan NIM. NIM yang sudah terdaftar akan ditolak, sama seperti pada program aslinya.</p>
+
+    <form id="form-tambah" novalidate>
+      <div class="field">
+        <label for="input-nama">Nama</label>
+        <input type="text" id="input-nama" placeholder="cth. Budi Hartono" autocomplete="off" required>
+      </div>
+      <div class="field">
+        <label for="input-nim">NIM</label>
+        <input type="text" id="input-nim" class="nim-input" placeholder="cth. 240803099" inputmode="numeric" autocomplete="off" required>
+      </div>
+      <button type="submit" class="primary">Tambah mahasiswa</button>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </form>
+
+    <p class="note">Data disimpan sementara di sesi peramban ini. Memuat ulang halaman akan mengembalikan data ke kondisi awal.</p>
+  </section>
+
+  <!-- Roster: Cari + Tampilkan Semua + Hapus -->
+  <section class="card roster-card">
+    <div class="roster-head">
+      <h2>Daftar mahasiswa <span class="count" id="count-label">(6 tercatat)</span></h2>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" id="input-cari" placeholder="Cari berdasarkan nama…" autocomplete="off">
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>NIM</th>
+            <th>Nama</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-mahasiswa"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Antarmuka web ini meniru langsung logika program Python: tambah, hapus berdasarkan NIM, cari berdasarkan nama, dan tampilkan semua.
+</footer>
+
+<script>
+(function(){
+  let daftarMahasiswa = [
+    {nama:"Fivi Syahfitri", nim:"240803007"},
+    {nama:"Annisa Nadila Pohan", nim:"240803010"},
+    {nama:"Juan Sagala", nim:"240803047"},
+    {nama:"Feri Wijaya", nim:"240803053"},
+    {nama:"Zefanya Yendisius Simamora", nim:"240803067"},
+    {nama:"Rio Alezzandro Bioddini Saragih", nim:"240803089"}
+  ];
+
+  let lastAddedNim = null;
+  let pendingDeleteNim = null;
+
+  const tbody = document.getElementById('tbody-mahasiswa');
+  const countLabel = document.getElementById('count-label');
+  const searchInput = document.getElementById('input-cari');
+  const form = document.getElementById('form-tambah');
+  const namaInput = document.getElementById('input-nama');
+  const nimInput = document.getElementById('input-nim');
+  const statusBox = document.getElementById('status');
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function showStatus(message, type){
+    statusBox.textContent = message;
+    statusBox.className = 'status show ' + type;
+    window.clearTimeout(showStatus._t);
+    showStatus._t = window.setTimeout(function(){
+      statusBox.classList.remove('show');
+    }, 3200);
+  }
+
+  function render(){
+    const term = searchInput.value.trim().toLowerCase();
+    const filtered = term
+      ? daftarMahasiswa.filter(function(m){ return m.nama.toLowerCase().includes(term); })
+      : daftarMahasiswa;
+
+    countLabel.textContent = term
+      ? '(' + filtered.length + ' dari ' + daftarMahasiswa.length + ' cocok)'
+      : '(' + daftarMahasiswa.length + ' tercatat)';
+
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0){
+      const tr = document.createElement('tr');
+      tr.className = 'empty-row';
+      const label = term ? 'Mahasiswa dengan nama "' + escapeHtml(searchInput.value.trim()) + '" tidak ditemukan.' : 'Daftar mahasiswa kosong.';
+      tr.innerHTML = '<td colspan="4">' + label + '</td>';
+      tbody.appendChild(tr);
+      return;
+    }
+
+    filtered.forEach(function(m, idx){
+      const tr = document.createElement('tr');
+      if (m.nim === lastAddedNim) tr.className = 'row-new';
+
+      const confirming = pendingDeleteNim === m.nim;
+      const aksiHtml = confirming
+        ? '<button type="button" class="icon-btn confirm" data-action="confirm" data-nim="' + m.nim + '">Hapus?</button>' +
+          '<button type="button" class="icon-btn cancel" data-action="cancel" data-nim="' + m.nim + '">Batal</button>'
+        : '<button type="button" class="icon-btn" data-action="ask" data-nim="' + m.nim + '">Hapus</button>';
+
+      tr.innerHTML =
+        '<td class="col-no">' + (idx + 1) + '</td>' +
+        '<td class="col-nim mono">' + escapeHtml(m.nim) + '</td>' +
+        '<td>' + escapeHtml(m.nama) + '</td>' +
+        '<td class="col-aksi">' + aksiHtml + '</td>';
+      tbody.appendChild(tr);
+    });
+
+    lastAddedNim = null;
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const nama = namaInput.value.trim();
+    const nim = nimInput.value.trim();
+
+    if (!nama || !nim){
+      showStatus('Nama dan NIM wajib diisi.', 'err');
+      return;
+    }
+    const sudahAda = daftarMahasiswa.some(function(m){ return m.nim === nim; });
+    if (sudahAda){
+      showStatus('Mahasiswa dengan NIM ' + nim + ' sudah ada.', 'err');
+      return;
+    }
+
+    daftarMahasiswa.push({nama:nama, nim:nim});
+    lastAddedNim = nim;
+    showStatus('Berhasil menambahkan ' + nama + ' (' + nim + ').', 'ok');
+    namaInput.value = '';
+    nimInput.value = '';
+    namaInput.focus();
+    searchInput.value = '';
+    render();
+  });
+
+  searchInput.addEventListener('input', render);
+
+  tbody.addEventListener('click', function(e){
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    const nim = btn.getAttribute('data-nim');
+    const action = btn.getAttribute('data-action');
+
+    if (action === 'ask'){
+      pendingDeleteNim = nim;
+      render();
+    } else if (action === 'cancel'){
+      pendingDeleteNim = null;
+      render();
+    } else if (action === 'confirm'){
+      const row = btn.closest('tr');
+      const removed = daftarMahasiswa.find(function(m){ return m.nim === nim; });
+      pendingDeleteNim = null;
+      if (row){
+        row.classList.add('row-leaving');
+        window.setTimeout(function(){
+          daftarMahasiswa = daftarMahasiswa.filter(function(m){ return m.nim !== nim; });
+          render();
+          if (removed) showStatus('Data mahasiswa dengan NIM ' + nim + ' berhasil dihapus.', 'ok');
+        }, 240);
+      }
+    }
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>
